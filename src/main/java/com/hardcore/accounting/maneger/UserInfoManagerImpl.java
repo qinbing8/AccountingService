@@ -2,11 +2,16 @@ package com.hardcore.accounting.maneger;
 
 import com.hardcore.accounting.converter.p2c.UserInfoP2CConverter;
 import com.hardcore.accounting.dao.UserInfoDao;
+import com.hardcore.accounting.exception.ResourceNotFountException;
+import com.hardcore.accounting.exception.ServiceException;
 import com.hardcore.accounting.model.common.UserInfo;
 
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Optional;
 
 @Component
 public class UserInfoManagerImpl implements UserInfoManager {
@@ -23,7 +28,9 @@ public class UserInfoManagerImpl implements UserInfoManager {
 
     @Override
     public UserInfo getUserInfoByUserId(Long userId) {
-        val userInfo = userInfoDao.getUserInfoById(userId);
+        val userInfo = Optional.ofNullable(userInfoDao.getUserInfoById(userId))
+            .orElseThrow(() -> new ResourceNotFountException(
+                String.format("User %s was not fount", userId)));
         return userInfoConverter.convert(userInfo);
     }
 }
